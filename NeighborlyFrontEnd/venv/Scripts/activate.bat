@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=E:\WEB\Flask\Azure_function\venv
+set VIRTUAL_ENV=C:\Users\USTA\OneDrive\Desktop\project\nd081_project2_repo\NeighborlyFrontEnd\venv
 
 if not defined PROMPT set PROMPT=$P$G
 
