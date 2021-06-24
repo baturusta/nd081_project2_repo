@@ -21,6 +21,13 @@
       "direction": "out",
       "apiKey": "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",
       "from": "batur.usta93@gmail.com"
+    },
+    {
+      "type": "eventHub",
+      "name": "$return",
+      "eventHubName": "neighborlyeventhub",
+      "connection": "Endpoint=sb://neighborlyeventhub2.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=Dso5YNWLyMcthb03GOygzSMsT5sWn024Hk0NbNsM3RU=",
+      "direction": "out"
     }
   ]
 }
