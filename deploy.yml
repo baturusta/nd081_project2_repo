@@ -1,0 +1,136 @@
+data:
+  FUNCTIONS_WORKER_RUNTIME: Q2ZESjhLdko2RG1ZeU1KQ2drUEtNSGk5eWdneG9iU05MK0VpQnVkcWpUYmtOMDhNVjhGUEd4N1dxS3lKWGkxdks1LzNPNDhZbnhRdkdqSnRCaUgyZ2J6aDhxVXhyQTJPbisxSlJmMXhRZVd3ZEt3QVRvY1N3VDFDTVQ5U04yZ3R6WHMwWlE9PQ==
+apiVersion: v1
+kind: Secret
+metadata:
+  name: projectaks
+---
+data:
+  host.master: clgwYUFobVFlaE85a3dtdlQ5eTd1MXp2OXdOVmFMTmEzcGlhRXF6Zm0zZ1NVcDNOd2xzVUdRPT0=
+  host.function.default: U01leXVBQW1mMEU3dmxnOGR1NFVZS292WmJFZmpMb3NEM2JIOWQvOXN4RXZCOUtiZHluVFh3PT0=
+  host.systemKey.default: TlYyeGZqTWQvZ2JUTUtNT25VWm5RVXd5d1RCY2R4dEp5d0JSbmVQWVlHTGlNdnFjeU9kNFNRPT0=
+  functions.createadvertisement.default: eTNQemdoUHZPTUx0OXNXbGZWN2lBVHpxSklhenBERGRHYzg2dEVFdEgyZ1F3bTE5cDh3cjBnPT0=
+  functions.deleteadvertisement.default: OXkxTklSN2YzZXl1RlBob0g4TFl1bFBFeUpZQUM4SnovTDdxNnFBV1Nhb1lqNXVkTmFLOGNRPT0=
+  functions.getadvertisement.default: UjRMcTBhNFVnYUJzTDh0V0c1SDQvRWFHTnk4R2lpb2VJSWFLVVl3bWZ6ZFM0WTY1VUMySmV3PT0=
+  functions.getadvertisements.default: cHdUbWtzT2t5U0tzMlhqL0xXSUMySVVmUzhTRDBVTjA2WHhoWlh4cWhsdzRrSXZkYzBNMkZRPT0=
+  functions.getpost.default: Ni8yZHJFb0phS1g5SHh3ODNtUW5kZk5KMnZRTk5yZHZrc2V2WXVZZkpjSGp0RDFIZDFCRVlRPT0=
+  functions.getposts.default: ZjFkQmUwM0pNWkFMb0dNSGYvS3Z0L0paY0Zqc2lhcGVZdWo1VUk3RkhZMzFXRWE5STUwZ3J3PT0=
+  functions.updateadvertisement.default: ZDhaTHQ4QmhpMWE5YVN0U1hWd3MzckV2Z0N4cWR6ZGFzdlNYeTNMbXM2NktMSDBtYndvZmVBPT0=
+apiVersion: v1
+kind: Secret
+metadata:
+  name: func-keys-kube-secret-projectaks
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: projectaks-function-keys-identity-svc-act
+---
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - secrets
+  - configMaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: functions-keys-manager-role
+---
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: functions-keys-manager-role
+subjects:
+- kind: ServiceAccount
+  name: projectaks-function-keys-identity-svc-act
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: projectaks-function-keys-identity-svc-act-functions-keys-manager-rolebinding
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: projectaks-http
+spec:
+  selector:
+    app: projectaks-http
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: projectaks-http
+  labels:
+    app: projectaks-http
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: projectaks-http
+  template:
+    metadata:
+      labels:
+        app: projectaks-http
+    spec:
+      containers:
+      - name: projectaks-http
+        image: neighborlycontainerimage.azurecr.io/neighborlyapp:v1
+        ports:
+        - containerPort: 80
+        env:
+        - name: AzureFunctionsJobHost__functions__0
+          value: createAdvertisement
+        - name: AzureFunctionsJobHost__functions__1
+          value: deleteAdvertisement
+        - name: AzureFunctionsJobHost__functions__2
+          value: getAdvertisement
+        - name: AzureFunctionsJobHost__functions__3
+          value: getAdvertisements
+        - name: AzureFunctionsJobHost__functions__4
+          value: getPost
+        - name: AzureFunctionsJobHost__functions__5
+          value: getPosts
+        - name: AzureFunctionsJobHost__functions__6
+          value: updateAdvertisement
+        - name: AzureWebJobsSecretStorageType
+          value: kubernetes
+        - name: AzureWebJobsKubernetesSecretName
+          value: secrets/func-keys-kube-secret-projectaks
+        envFrom:
+        - secretRef:
+            name: projectaks
+        readinessProbe:
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 240
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+        startupProbe:
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 240
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+      serviceAccountName: projectaks-function-keys-identity-svc-act
+---
+

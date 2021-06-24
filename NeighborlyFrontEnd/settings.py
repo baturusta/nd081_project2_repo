@@ -9,7 +9,7 @@ RESTPLUS_VALIDATE = True
 RESTPLUS_MASK_SWAGGER = False
 RESTPLUS_404_HELP = True
 API_VERSION = 'v1'
-
+ 
 #-------- Azure constants
 
 # API_URL format: "https://[FUNCTION_APP_NAME_GOES_HERE].azurewebsites.net"
