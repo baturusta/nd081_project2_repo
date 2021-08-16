@@ -19,7 +19,7 @@
       "type": "sendGrid",
       "name": "sendGridMessage",
       "direction": "out",
-      "apiKey": "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",
+      "apiKey": "",
       "from": "batur.usta93@gmail.com"
     },
     {
